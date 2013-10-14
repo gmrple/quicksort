@@ -140,14 +140,18 @@ void quicksort(int* arr, int size){
 }
 
 void insert(int* arr, int val, int idx, int end_idx){
-	/* save the index that the value goes to */ 
-	int temp = idx;
-	
+	/* start at the index that the value goes */
+	int i = idx;
+	int temp = arr[idx];	
+	int temp1 = 0;
+
 	/* shift everything starting at that index over 1 */
-	for (;temp < end_idx; temp++){
-		arr[temp] = arr[temp+1];	
+	for (; i<end_idx; i++){
+		temp1 = arr[i+1];	
+		arr[i+1] = temp;
+		swap(&temp, &temp1);
 	}
-	
+
 	/* now that the shifting is done, put the value at the correct index */
 	arr[idx] = val;
 }
