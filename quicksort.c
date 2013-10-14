@@ -5,9 +5,12 @@
 #include "unistd.h"
 #include "errno.h"
 
+#define QS_MIN_SZ 100
+
 int map_file(int fd, unsigned char rw, void** mapped_addr, size_t size);
 int unmap_file(void* map, size_t size);
-
+void quicksort(int * arr, int size);
+void insertion_sort(int* arr, int size);
 extern int errno;
 
 int main(){
@@ -17,8 +20,8 @@ int main(){
     size_t size;
 	int status = -1;
     struct stat s;
-    unsigned int* infile_mapped = NULL;
-    unsigned int* outfile_mapped = NULL;
+    int* infile_mapped = NULL;
+    int* outfile_mapped = NULL;
 	int i =0;
 	int t = 0;
 
@@ -104,13 +107,66 @@ int main(){
     /* we don't really care about the status
         because we're quitting directly after */ 
     unmap_file( infile_mapped, size);
-	unmap_file(outfile_mapped, size);
-	
 	close(fd[0]);
+
+	quicksort(outfile_mapped, 50);/*size >> 2);*/
+
+	for (i=0; i<50; i++){
+		printf("%d\n",outfile_mapped[i]);
+	}
+	unmap_file(outfile_mapped, size);
 	close(fd[1]);
 
     return 0;
 }
+
+inline void swap( int* a, int* b){
+	int temp;
+	temp = *a;
+	*a = *b;
+	*b = temp;
+}
+
+/***********************************
+* Quicksort
+* A quick in place implementation
+* of quicksort. This will pick the 
+* best of 3 values for the pivot
+***********************************/
+void quicksort(int* arr, int size){
+	if (size < QS_MIN_SZ){
+		insertion_sort(arr, size);
+	}
+}
+
+void insert(int* arr, int val, int idx, int end_idx){
+	/* save the index that the value goes to */ 
+	int temp = idx;
+	
+	/* shift everything starting at that index over 1 */
+	for (;temp < end_idx; temp++){
+		arr[temp] = arr[temp+1];	
+	}
+	
+	/* now that the shifting is done, put the value at the correct index */
+	arr[idx] = val;
+}
+
+void insertion_sort(int* arr, int size){
+	int i = 1;
+	int j = 0;
+
+	for (; i<size; i++){
+		/* find each element's place */
+		for (j = 0; j < i; j++){
+			if (arr[i] < arr[j]){
+				insert(arr, arr[i], j, i);
+				break;
+			}
+		}
+	}
+}
+	
 
 /*  
 *   rw == 1 :  read
