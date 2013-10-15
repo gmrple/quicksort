@@ -5,7 +5,7 @@
 #include "unistd.h"
 #include "errno.h"
 
-#define QS_MIN_SZ 100
+#define QS_MIN_SZ 5
 
 int map_file(int fd, unsigned char rw, void** mapped_addr, size_t size);
 int unmap_file(void* map, size_t size);
@@ -134,9 +134,51 @@ inline void swap( int* a, int* b){
 * best of 3 values for the pivot
 ***********************************/
 void quicksort(int* arr, int size){
+	int pivot = 0;
+	int i = 0;
+	
+	/* these contain the index of one past the ends 
+		of each respective inner array */
+	int left_end = 0;
+	int right_end = size - 2; 
+	
+	int left_size = 0;
+	int right_size = 0;
+
+	/* base case */
 	if (size < QS_MIN_SZ){
 		insertion_sort(arr, size);
 	}
+	
+	/* a manageable size for testing */
+	size = 50;
+	
+	/* TODO: choose pivot here, and set it to the last element */
+	
+	pivot = arr[size-1];
+
+	while (left_end - 1 != right_end){
+		if(arr[i] < pivot){
+			/* this belongs on the left, but it's already on the left! */
+			i++;
+			left_end++;
+		} else {
+			/* add to right */
+			swap(arr+right_end, arr+i);
+			right_end--;
+		}
+	}
+
+	/* move the pivot to the middle */
+	swap(arr+size-1,arr+ right_end + 1);
+	right_end++;
+	
+	left_size = left_end;
+	right_size = size - left_end - 1;
+
+	/* do the recursive calls */	
+	quicksort(arr, left_size);
+	quicksort(arr + right_end + 1, right_size);
 }
 
 void insert(int* arr, int val, int idx, int end_idx){
