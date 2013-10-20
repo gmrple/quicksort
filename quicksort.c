@@ -5,7 +5,8 @@
 #include "unistd.h"
 #include "errno.h"
 
-#define QS_MIN_SZ 5
+#define QS_MIN_SZ 50
+#define MAX_THREADS 4
 
 int map_file(int fd, unsigned char rw, void** mapped_addr, size_t size);
 int unmap_file(void* map, size_t size);
@@ -109,9 +110,9 @@ int main(){
     unmap_file( infile_mapped, size);
 	close(fd[0]);
 
-	quicksort(outfile_mapped, 50);/*size >> 2);*/
+	quicksort(outfile_mapped, size >> 2);
 
-	for (i=0; i<50; i++){
+	for (i=0; i<500; i++){
 		printf("%d\n",outfile_mapped[i]);
 	}
 	unmap_file(outfile_mapped, size);
@@ -137,21 +138,30 @@ void quicksort(int* arr, int size){
 	int pivot = 0;
 	int i = 0;
 	
+	/* organization of the array:
+	 * arr[0:left_end-1] = smaller than pivot
+	 * arr[left_end:right_end] = unsorted
+	 * arr[right_end+1:size-2] = greater than pivot
+	 * arr[size-1] = pivot
+	 */
+
 	/* these contain the index of one past the ends 
 		of each respective inner array */
 	int left_end = 0;
-	int right_end = size - 2; 
+	int right_end = size - 2;
 	
 	int left_size = 0;
 	int right_size = 0;
+	
+	if (size == 0)
+		return;
 
 	/* base case */
-	if (size < QS_MIN_SZ){
+	if (size <= QS_MIN_SZ){
 		insertion_sort(arr, size);
+		return;
 	}
 	
-	/* a manageable size for testing */
-	size = 50;
 	
 	/* TODO: choose pivot here, and set it to the last element */
 	

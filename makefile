@@ -5,8 +5,8 @@ opt = $(warn) $(optim)
 
 all : mmap
 
-mmap : quicksort.c
-	cc quicksort.c -o mmap $(opt) 
+quicksort : quicksort.c
+	cc quicksort.c -o quicksort $(opt) 
 
 clean :
 	rm mmap
